@@ -1,0 +1,31 @@
+{
+  "name": "shiftspace",
+  "version": "1.0.0",
+  "description": "Backend API for ShiftSpace - Project Management App",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "shiftSpace",
+    "project-management",
+    "nodejs",
+    "expressjs",
+    "mongodb"
+  ],
+  "author": "Satish Kumar Gupta",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
