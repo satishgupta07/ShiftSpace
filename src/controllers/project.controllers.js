@@ -39,7 +39,7 @@ const getProjects = asyncHandler(async (req, res) => {
             },
         },
         {
-            $unwind: "$project",
+            $unwind: "$projects",
         },
         {
             $project: {
