@@ -44,7 +44,7 @@ export const validateProjectPermission = (roles = []) => {
         });
 
         if (!project) {
-            throw new ApiError(400, "project not found");
+            throw new ApiError(403, "You do not have access  ot this project");
         }
 
         const givenRole = project?.role;

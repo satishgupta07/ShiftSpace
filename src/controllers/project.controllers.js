@@ -5,6 +5,8 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { UserRolesEnum } from "../utils/constants.js";
+import { Task } from "../models/task.model.js";
+import { Subtask } from "../models/subtask.model.js";
 
 const getProjects = asyncHandler(async (req, res) => {
     const projects = await ProjectMember.aggregate([
@@ -116,6 +118,14 @@ const deleteProject = asyncHandler(async (req, res) => {
     if (!project) {
         throw new ApiError(404, "Project not found");
     }
+
+    const tasks = await Task.find({ project: new mongoose.Types.ObjectId(projectId) }).select("_id")
+    const taskIds = tasks.map((t) => t._id);
+
+    await Subtask.deleteMany({ task: { $in: taskIds } });
+    await Task.deleteMany({ project: new mongoose.Types.ObjectId(projectId) });
+    await ProjectMember.deleteMany({ project: new mongoose.Types.ObjectId(projectId) });
+
     return res
         .status(200)
         .json(new ApiResponse(200, project, "Project deleted successfully"));

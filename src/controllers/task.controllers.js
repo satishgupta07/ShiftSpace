@@ -34,7 +34,7 @@ const createTask = asyncHandler(async (req, res) => {
 
     const attachments = files.map((file) => {
         return {
-            url: `${process.env.SERVER_URL}/images/${file.originalname}`,
+            url: `${process.env.SERVER_URL}/images/${file.filename}`,
             mimetype: file.mimetype,
             size: file.size
         }
@@ -145,7 +145,7 @@ const createSubTask = asyncHandler(async (req, res) => {
     })
 
     if (!task) {
-        throw new ApiError(404, "Task not foud");
+        throw new ApiError(404, "Task not found");
     }
 
     const subtask = await Subtask.create({
