@@ -3,7 +3,7 @@ import { validateProjectPermission, verifyJWT } from "../middlewares/auth.middle
 import { AvailableUserRole, UserRolesEnum } from "../utils/constants.js";
 import { createTaskValidator } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middleware.js";
-import { createTask, getTasks } from "../controllers/task.controllers.js";
+import { createTask, getTaskById, getTasks } from "../controllers/task.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -19,5 +19,9 @@ router
         validate,
         createTask
     );
+
+router
+    .route("/:projectId/t/:taskId")
+    .get(validateProjectPermission(AvailableUserRole), getTaskById)
 
 export default router;
