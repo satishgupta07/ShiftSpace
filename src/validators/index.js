@@ -56,11 +56,21 @@ const createProjectValidator = () => {
     ];
 };
 
+const createTaskValidator = () => {
+    return [
+        body("title").trim().notEmpty().withMessage("Title is required"),
+        body("description").optional().trim(),
+        body("assignedTo").optional().isMongoId().withMessage("assignedTo must be a valid user id"),
+        body("status").optional().isIn(["todo", "in_progress", "done"]).withMessage("status must be todo, in_progress, or done")
+    ];
+};
+
 export {
     userRegisterValidator,
     userLoginValidator,
     userChangeCurrentPasswordValidator,
     userForgotPasswordValidator,
     userResetForgotPasswordValidator,
-    createProjectValidator
+    createProjectValidator,
+    createTaskValidator
 }
