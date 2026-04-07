@@ -16,7 +16,7 @@ const getProjects = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: "projects",
-                localField: "projects",
+                localField: "project",
                 foreignField: "_id",
                 as: "projects",
                 pipeline: [
@@ -24,7 +24,7 @@ const getProjects = asyncHandler(async (req, res) => {
                         $lookup: {
                             from: "projectmembers",
                             localField: "_id",
-                            foreignField: "projects",
+                            foreignField: "project",
                             as: "projectmembers",
                         },
                     },
@@ -43,14 +43,7 @@ const getProjects = asyncHandler(async (req, res) => {
         },
         {
             $project: {
-                project: {
-                    _id: 1,
-                    name: 1,
-                    description: 1,
-                    members: 1,
-                    createdAt: 1,
-                    createdBy: 1,
-                },
+                project: "$projects",
                 role: 1,
                 _id: 0,
             },

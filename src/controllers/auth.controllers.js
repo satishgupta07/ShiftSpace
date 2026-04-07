@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -23,7 +24,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { email, username, password, role } = req.body;
+    const { email, username, password } = req.body;
 
     const existedUser = await User.findOne({
         $or: [{ username }, { email }],
@@ -76,10 +77,10 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, username, password } = req.body;
+    const { email, password } = req.body;
 
     if (!email) {
-        throw new ApiError(400, " email is required");
+        throw new ApiError(400, "email is required");
     }
 
     const user = await User.findOne({ email });
@@ -158,8 +159,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const verifyEmail = asyncHandler(async (req, res) => {
     const { verificationToken } = req.params;
 
-    console.log("verificationToken", verificationToken)
-
     if (!verificationToken) {
         throw new ApiError(400, "Email verification token is missing");
     }
@@ -173,8 +172,6 @@ const verifyEmail = asyncHandler(async (req, res) => {
         emailVerificationToken: hashedToken,
         emailVerificationExpiry: { $gt: Date.now() },
     });
-
-    console.log(user);
 
     if (!user) {
         throw new ApiError(400, "Token is invalid or expired");
@@ -331,7 +328,7 @@ const resetForgotPassword = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        throw new ApiError(489, "Token is invalid or expired");
+        throw new ApiError(401, "Token is invalid or expired");
     }
 
     user.forgotPasswordExpiry = undefined;
@@ -357,6 +354,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     }
 
     user.password = newPassword;
+    user.refreshToken = "";
     await user.save({ validateBeforeSave: false });
 
     return res
