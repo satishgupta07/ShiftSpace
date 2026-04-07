@@ -4,6 +4,7 @@ import { Task } from "../models/task.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Subtask } from "../models/subtask.model.js";
 
 const getTasks = asyncHandler(async (req, res) => {
     const { projectId } = req.params;
@@ -135,7 +136,27 @@ const getTaskById = asyncHandler(async (req, res) => {
 });
 
 const createSubTask = asyncHandler(async (req, res) => {
-    //Todo
+    const { projectId, taskId } = req.params;
+    const { title } = req.body;
+
+    const task = await Task.findOne({
+        _id: new mongoose.Types.ObjectId(taskId),
+        project: new mongoose.Types.ObjectId(projectId)
+    })
+
+    if (!task) {
+        throw new ApiError(404, "Task not foud");
+    }
+
+    const subtask = await Subtask.create({
+        title,
+        task: new mongoose.Types.ObjectId(taskId),
+        createdBy: new mongoose.Types.ObjectId(req.user._id)
+    })
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, subtask, "Subtask created successfully"))
 });
 
 export {

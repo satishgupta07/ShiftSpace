@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { validateProjectPermission, verifyJWT } from "../middlewares/auth.middleware.js";
 import { AvailableUserRole, UserRolesEnum } from "../utils/constants.js";
-import { createTaskValidator } from "../validators/index.js";
+import { createSubtaskValidator, createTaskValidator } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middleware.js";
-import { createTask, getTaskById, getTasks } from "../controllers/task.controllers.js";
+import { createSubTask, createTask, getTaskById, getTasks } from "../controllers/task.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -23,5 +23,14 @@ router
 router
     .route("/:projectId/t/:taskId")
     .get(validateProjectPermission(AvailableUserRole), getTaskById)
+
+router
+    .route("/:projectId/t/:taskId/subtasks")
+    .post(
+        validateProjectPermission([UserRolesEnum.ADMIN, UserRolesEnum.PROJECT_ADMIN]),
+        createSubtaskValidator(),
+        validate,
+        createSubTask
+    )
 
 export default router;

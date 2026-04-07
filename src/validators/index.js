@@ -65,6 +65,12 @@ const createTaskValidator = () => {
     ];
 };
 
+const createSubtaskValidator = () => {
+    return [
+        body("title").trim().notEmpty().withMessage("Title is required")
+    ]
+}
+
 export {
     userRegisterValidator,
     userLoginValidator,
@@ -72,5 +78,6 @@ export {
     userForgotPasswordValidator,
     userResetForgotPasswordValidator,
     createProjectValidator,
-    createTaskValidator
+    createTaskValidator,
+    createSubtaskValidator
 }
