@@ -12,7 +12,7 @@ const router = Router();
 router.use(verifyJWT);
 
 /* GET /tasks/:projectId -> any project member can lits tasks
-   PUT /tasks/:projectId -> only ADMIN or PROJECT_ADMIN can create tasks;
+   POST /tasks/:projectId -> only ADMIN or PROJECT_ADMIN can create tasks;
                             upload.array("attachments") handles multi-file upload before validation   */
 router
     .route("/:projectId")

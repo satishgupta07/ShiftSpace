@@ -9,8 +9,8 @@ import { Task } from "../models/task.model.js";
 import { Subtask } from "../models/subtask.model.js";
 
 const getProjects = asyncHandler(async (req, res) => {
-    /* Aggregate from ProjectMember so each results includes the caller's role
-       alongside the project DataTransfer. A sub-pipeline counts total members per project. */
+    /* Aggregate from ProjectMember so each result includes the caller's role
+       alongside the project data. A sub-pipeline counts total members per project. */
     const projects = await ProjectMember.aggregate([
         {
             $match: {

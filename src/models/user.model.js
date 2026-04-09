@@ -63,7 +63,7 @@ const userSchema = new Schema(
     },
 );
 
-/* Hash the password only when it has actually changes to avoid 
+/* Hash the password only when it has actually changed to avoid 
     re-hashing an already-hashed value on unrelated saves. */
 userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
@@ -99,7 +99,7 @@ userSchema.methods.generateRefreshToken = function () {
 
 /* Generates a short-lived token pair for email verification and password reset.
     The plain token is sent to the user (via email link); only the SHA-256 hash
-    is persisted in the DB so a leaked DB recored cannot be used directly. */
+    is persisted in the DB so a leaked DB record cannot be used directly. */
 userSchema.methods.generateTemporaryToken = function () {
     const unHashedToken = crypto.randomBytes(20).toString("hex")
 

@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import { AvailableUserRole, UserRolesEnum } from "../utils/constants.js";
 
-/* Junction table linking users to project with a role.
-    A user's project-level role is stored here,  separated from any global role,
-    so the same user can have different roles across differnet projects. */
+/* Junction table linking users to projects with a role.
+    A user's project-level role is stored here, separate from any global role,
+    so the same user can have different roles across different projects. */
 const projectMemberSchema = new Schema(
     {
         user: {

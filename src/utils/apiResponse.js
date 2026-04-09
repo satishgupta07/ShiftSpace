@@ -1,4 +1,4 @@
-/* Standardised success wrapper for all API reponses. */
+/* Standardised success wrapper for all API responses. */
 class ApiResponse {
     constructor(statusCode, data, message = "Success") {
         this.statusCode = statusCode;

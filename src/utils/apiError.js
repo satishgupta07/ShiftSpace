@@ -1,4 +1,4 @@
-/* Standardised error class for all API reponses */
+/* Standardised error class for all API responses */
 class ApiError extends Error {
     constructor(
         statusCode,

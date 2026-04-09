@@ -8,7 +8,7 @@ import { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmai
 
 /* Generates a new access/refresh token pair and persists the refresh token.
     validateBeforeSave: false -> skips schema validation so only the refreshToken
-    field is updated with requiring all required fields to be re-suppliad. */
+    field is updated without requiring all required fields to be re-supplied. */
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);

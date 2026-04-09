@@ -19,7 +19,7 @@ router
 
 // GET /projects/:projectId -> any project member can view the project
 // PUT /projects/:projectId -> only ADMIN can update project details
-// PUT /projects/:projectId -> only ADMIN can delete the project (cascade to task/members)
+// DELETE /projects/:projectId -> only ADMIN can delete the project (cascade to task/members)
 router
     .route("/:projectId")
     .get(validateProjectPermission(AvailableUserRole), getProjectById)

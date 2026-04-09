@@ -33,7 +33,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 });
 
-/* Returns a middlewware that checks whether the authenticated user is a member
+/* Returns a middleware that checks whether the authenticated user is a member
     of the requested project and holds one of the allowed roles.
     The user's project-scoped role is attached to req.user.role for use in controllers. */
 export const validateProjectPermission = (roles = []) => {
@@ -55,7 +55,7 @@ export const validateProjectPermission = (roles = []) => {
 
         const givenRole = project?.role;
 
-        /* Attach the project-scoped role so downstream handlers can inpect it */
+        /* Attach the project-scoped role so downstream handlers can inspect it */
         req.user.role = givenRole;
 
         if (!roles.includes(givenRole)) {
