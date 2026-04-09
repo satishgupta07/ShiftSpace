@@ -1,3 +1,7 @@
+/* Centralised express-validator chains. Each function return an array of 
+    validations rules that is spread into the route middleware chain, followed
+    by the 'validate' middleware which reads the results and short-circuits 
+    with a 422 error if any rule fails. */
 import { body } from "express-validator";
 
 const userRegisterValidator = () => {

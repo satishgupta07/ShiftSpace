@@ -6,6 +6,9 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail } from "../utils/mail.js";
 
+/* Generates a new access/refresh token pair and persists the refresh token.
+    validateBeforeSave: false -> skips schema validation so only the refreshToken
+    field is updated with requiring all required fields to be re-suppliad. */
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
@@ -103,6 +106,7 @@ const loginUser = asyncHandler(async (req, res) => {
         "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
     );
 
+    // httpOnly prevents JS access; secure ensures cookies are only sent over HTTPS
     const options = {
         httpOnly: true,
         secure: true,
@@ -163,11 +167,13 @@ const verifyEmail = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email verification token is missing");
     }
 
+    // Hash the incoming plain token to compare against the stored hash
     let hashedToken = crypto
         .createHash("sha256")
         .update(verificationToken)
         .digest("hex");
 
+    // Verify token hasn't expired as well as matching the stored hash
     const user = await User.findOne({
         emailVerificationToken: hashedToken,
         emailVerificationExpiry: { $gt: Date.now() },
@@ -245,6 +251,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(401, "Invalid refresh token");
         }
 
+        // Rejected reused/rotated tokens that no longer match the stored one
         if (incomingRefreshToken !== user?.refreshToken) {
             throw new ApiError(401, "Refresh token in expired");
         }

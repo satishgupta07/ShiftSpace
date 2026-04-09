@@ -27,6 +27,8 @@ const taskSchema = new Schema(
             enum: AvailableTaskStatues,
             default: TaskStatusEnum.TODO
         },
+        /* Each attachment stores the public URL, MIME type, and size so the 
+            client can render a preview and display file metadata without extra requests. */
         attachments: {
             type: [
                 {

@@ -1,5 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
+/* Stores free-form notes scoped to a project. 
+    Notes are user-authored and tied to a specific project, allowing team members
+    to leave context, decisions, or documentation  alongside tasks. */
 const projectNoteSchema = new Schema(
     {
         project: {

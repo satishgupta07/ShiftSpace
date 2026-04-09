@@ -5,9 +5,12 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 // basic configurations
+// body parsing - 16kb cap prevents large payload attacks
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+// serve uploaded files from the the public directory
 app.use(express.static("public"));
+// cookieParser makes req.cookies available; need for JWT cookie-based auth
 app.use(cookieParser());
 
 // cors configurations

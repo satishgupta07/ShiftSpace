@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
+/* Subtasks are lightweight checklist items that belong to a parent task.
+   They have status - isCompleted - is a simple boolean toggle  */
 const subTaskSchema = new Schema(
     {
         title: {

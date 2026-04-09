@@ -58,6 +58,9 @@ const createTask = asyncHandler(async (req, res) => {
 const getTaskById = asyncHandler(async (req, res) => {
     const { projectId, taskId } = req.params;
 
+    /* Single aggregate fetches the task, its assigne, and all subtasks with their
+        creators in one round-trip. $arrayElemAt[0] unwraps the single-element arrays 
+        produced by $lookup into plain objects. */
     const task = await Task.aggregate([
         {
             $match: {
@@ -91,6 +94,7 @@ const getTaskById = asyncHandler(async (req, res) => {
                 as: "subtasks",
                 pipeline: [
                     {
+                        /* Resolve each subtask's creator inside the same pipeline */
                         $lookup: {
                             from: "users",
                             localField: "createdBy",

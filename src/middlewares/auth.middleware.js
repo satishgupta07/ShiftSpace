@@ -5,6 +5,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ProjectMember } from "../models/projectmember.models.js";
 import mongoose from "mongoose";
 
+/* Supports both cookie-based auth (browser clients) and Bearer token auth
+    (API / mobile clients). Attaches the authenticated user to req.user */
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token =
         req.cookies?.accessToken ||
@@ -16,6 +18,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     try {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        /* Sensitive fields are excluded so they are never exposed downstream */
         const user = await User.findById(decodedToken?._id).select(
             "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
         );
@@ -30,6 +33,9 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 });
 
+/* Returns a middlewware that checks whether the authenticated user is a member
+    of the requested project and holds one of the allowed roles.
+    The user's project-scoped role is attached to req.user.role for use in controllers. */
 export const validateProjectPermission = (roles = []) => {
     return asyncHandler(async (req, res, next) => {
         const { projectId } = req.params;
@@ -49,6 +55,7 @@ export const validateProjectPermission = (roles = []) => {
 
         const givenRole = project?.role;
 
+        /* Attach the project-scoped role so downstream handlers can inpect it */
         req.user.role = givenRole;
 
         if (!roles.includes(givenRole)) {

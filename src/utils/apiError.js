@@ -1,3 +1,4 @@
+/* Standardised error class for all API reponses */
 class ApiError extends Error {
     constructor(
         statusCode,
@@ -15,6 +16,8 @@ class ApiError extends Error {
         if (stack) {
             this.stack = stack;
         } else {
+            /* Removes the constructor call itself from the stack trace
+                so the trace starts at the actual throw site. */
             Error.captureStackTrace(this, this.constructor);
         }
     }
