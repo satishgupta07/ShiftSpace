@@ -13,6 +13,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
+        logger.warn(`Auth failed - no token [${req.method} ${req.originalUrl}]`);
         throw new ApiError(401, "Unauthorized request");
     }
 
@@ -24,11 +25,13 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         );
 
         if (!user) {
+            logger.warn(`Auth failed - token valid but user not found [id: ${decodedToken?._id}]`);
             throw new ApiError(401, "Invalid access token");
         }
         req.user = user;
         next();
     } catch (error) {
+        logger.warn(`Auth failed - invalid token [${req.method} ${req.originalUrl}]`);
         throw new ApiError(401, "Invalid access token");
     }
 });
