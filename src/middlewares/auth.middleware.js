@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ProjectMember } from "../models/projectmember.models.js";
 import mongoose from "mongoose";
+import logger from "../utils/logger.js";
 
 /* Supports both cookie-based auth (browser clients) and Bearer token auth
     (API / mobile clients). Attaches the authenticated user to req.user */

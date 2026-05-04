@@ -163,9 +163,131 @@ const createSubTask = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, subtask, "Subtask created successfully"))
 });
 
+/* PUT /:projectId/t/:taskId
+   Only ADMIN or PROJECT_ADMIN can update task details.
+   Partial updates are supported — only provided fields are applied. */
+const updateTask = asyncHandler(async (req, res) => {
+    const { projectId, taskId } = req.params;
+    const { title, description, assignedTo, status } = req.body;
+
+    const task = await Task.findOneAndUpdate(
+        {
+            _id: new mongoose.Types.ObjectId(taskId),
+            project: new mongoose.Types.ObjectId(projectId),
+        },
+        {
+            title,
+            description,
+            status,
+            ...(assignedTo && { assignedTo: new mongoose.Types.ObjectId(assignedTo) }),
+        },
+        { new: true },
+    );
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task updated successfully"));
+});
+
+/* DELETE /:projectId/t/:taskId
+   Only ADMIN or PROJECT_ADMIN can delete a task.
+   Cascade deletes all subtasks belonging to the task. */
+const deleteTask = asyncHandler(async (req, res) => {
+    const { projectId, taskId } = req.params;
+
+    const task = await Task.findOneAndDelete({
+        _id: new mongoose.Types.ObjectId(taskId),
+        project: new mongoose.Types.ObjectId(projectId),
+    });
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    await Subtask.deleteMany({ task: new mongoose.Types.ObjectId(taskId) });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task deleted successfully"));
+});
+
+/* PUT /:projectId/t/:taskId/subtasks/:subtaskId
+   Any project member can update a subtask (e.g. toggle isCompleted).
+   Both title and isCompleted are optional — only supplied fields are applied. */
+const updateSubtask = asyncHandler(async (req, res) => {
+    const { projectId, taskId, subtaskId } = req.params;
+    const { title, isCompleted } = req.body;
+
+    /* Confirm the parent task belongs to this project before touching the subtask */
+    const task = await Task.findOne({
+        _id: new mongoose.Types.ObjectId(taskId),
+        project: new mongoose.Types.ObjectId(projectId),
+    });
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    const subtask = await Subtask.findOneAndUpdate(
+        {
+            _id: new mongoose.Types.ObjectId(subtaskId),
+            task: new mongoose.Types.ObjectId(taskId),
+        },
+        {
+            ...(title !== undefined && { title }),
+            ...(isCompleted !== undefined && { isCompleted }),
+        },
+        { new: true },
+    );
+
+    if (!subtask) {
+        throw new ApiError(404, "Subtask not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, subtask, "Subtask updated successfully"));
+});
+
+/* DELETE /:projectId/t/:taskId/subtasks/:subtaskId
+   Only ADMIN or PROJECT_ADMIN can delete a subtask. */
+const deleteSubtask = asyncHandler(async (req, res) => {
+    const { projectId, taskId, subtaskId } = req.params;
+
+    const task = await Task.findOne({
+        _id: new mongoose.Types.ObjectId(taskId),
+        project: new mongoose.Types.ObjectId(projectId),
+    });
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    const subtask = await Subtask.findOneAndDelete({
+        _id: new mongoose.Types.ObjectId(subtaskId),
+        task: new mongoose.Types.ObjectId(taskId),
+    });
+
+    if (!subtask) {
+        throw new ApiError(404, "Subtask not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, subtask, "Subtask deleted successfully"));
+});
+
 export {
     getTasks,
     createTask,
     getTaskById,
-    createSubTask
+    createSubTask,
+    updateTask,
+    deleteTask,
+    updateSubtask,
+    deleteSubtask,
 }

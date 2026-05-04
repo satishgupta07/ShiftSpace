@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { validateProjectPermission, verifyJWT } from "../middlewares/auth.middleware.js";
 import { createProject, deleteProject, getProjectById, getProjects, updateProject } from "../controllers/project.controllers.js";
+import { getProjectMembers, addProjectMember, updateMemberRole, removeProjectMember } from "../controllers/projectmember.controllers.js";
 import { AvailableUserRole, UserRolesEnum } from "../utils/constants.js";
-import { createProjectValidator } from "../validators/index.js";
+import { createProjectValidator, addProjectMemberValidator, updateMemberRoleValidator } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middleware.js";
 
 const router = Router();
@@ -30,5 +31,29 @@ router
         updateProject,
     )
     .delete(validateProjectPermission([UserRolesEnum.ADMIN]), deleteProject);
+
+// GET /projects/:projectId/members -> any project member can list all members
+// POST /projects/:projectId/members -> only ADMIN can add a new member
+router
+    .route("/:projectId/members")
+    .get(validateProjectPermission(AvailableUserRole), getProjectMembers)
+    .post(
+        validateProjectPermission([UserRolesEnum.ADMIN]),
+        addProjectMemberValidator(),
+        validate,
+        addProjectMember,
+    );
+
+// PUT /projects/:projectId/members/:userId -> only ADMIN can update a member's role
+// DELETE /projects/:projectId/members/:userId -> only ADMIN can remove a member
+router
+    .route("/:projectId/members/:userId")
+    .put(
+        validateProjectPermission([UserRolesEnum.ADMIN]),
+        updateMemberRoleValidator(),
+        validate,
+        updateMemberRole,
+    )
+    .delete(validateProjectPermission([UserRolesEnum.ADMIN]), removeProjectMember);
 
 export default router;

@@ -45,6 +45,7 @@ import healthCheckRouter from "./routes/healthcheck.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import projectRouter from "./routes/project.routes.js";
 import taskRouter from "./routes/task.routes.js";
+import noteRouter from "./routes/note.routes.js";
 import morgan from "morgan";
 import logger from "./utils/logger.js";
 
@@ -52,9 +53,23 @@ app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/notes", noteRouter);
 
 app.get("/", (req, res) => {
     res.send("Welcome to ShiftSpace");
+});
+
+/* Global error handler — must be registered after all routes.
+   Converts ApiError instances and unexpected errors to a consistent JSON
+   shape so every client always receives a structured body, never raw HTML. */
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        statusCode,
+        message: err.message || "Internal Server Error",
+        errors: err.errors || [],
+        success: false,
+    });
 });
 
 export default app;

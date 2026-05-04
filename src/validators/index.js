@@ -3,6 +3,7 @@
     by the 'validate' middleware which reads the results and short-circuits 
     with a 422 error if any rule fails. */
 import { body } from "express-validator";
+import { AvailableUserRole, AvailableTaskStatues } from "../utils/constants.js";
 
 const userRegisterValidator = () => {
     return [
@@ -65,7 +66,7 @@ const createTaskValidator = () => {
         body("title").trim().notEmpty().withMessage("Title is required"),
         body("description").optional().trim(),
         body("assignedTo").optional().isMongoId().withMessage("assignedTo must be a valid user id"),
-        body("status").optional().isIn(["todo", "in_progress", "done"]).withMessage("status must be todo, in_progress, or done")
+        body("status").optional().isIn(AvailableTaskStatues).withMessage(`status must be one of: ${AvailableTaskStatues.join(", ")}`)
     ];
 };
 
@@ -75,6 +76,58 @@ const createSubtaskValidator = () => {
     ]
 }
 
+const updateTaskValidator = () => {
+    return [
+        body("title").optional().trim().notEmpty().withMessage("Title cannot be empty"),
+        body("description").optional().trim(),
+        body("assignedTo").optional().isMongoId().withMessage("assignedTo must be a valid user id"),
+        body("status").optional().isIn(AvailableTaskStatues).withMessage(`status must be one of: ${AvailableTaskStatues.join(", ")}`),
+    ];
+};
+
+const updateSubtaskValidator = () => {
+    return [
+        body("title").optional().trim().notEmpty().withMessage("Title cannot be empty"),
+        body("isCompleted").optional().isBoolean().withMessage("isCompleted must be a boolean"),
+    ];
+};
+
+const createNoteValidator = () => {
+    return [
+        body("content").trim().notEmpty().withMessage("Content is required"),
+    ];
+};
+
+const updateNoteValidator = () => {
+    return [
+        body("content").trim().notEmpty().withMessage("Content is required"),
+    ];
+};
+
+const addProjectMemberValidator = () => {
+    return [
+        body("userId")
+            .notEmpty()
+            .withMessage("userId is required")
+            .isMongoId()
+            .withMessage("userId must be a valid user id"),
+        body("role")
+            .optional()
+            .isIn(AvailableUserRole)
+            .withMessage(`role must be one of: ${AvailableUserRole.join(", ")}`),
+    ];
+};
+
+const updateMemberRoleValidator = () => {
+    return [
+        body("role")
+            .notEmpty()
+            .withMessage("role is required")
+            .isIn(AvailableUserRole)
+            .withMessage(`role must be one of: ${AvailableUserRole.join(", ")}`),
+    ];
+};
+
 export {
     userRegisterValidator,
     userLoginValidator,
@@ -83,5 +136,11 @@ export {
     userResetForgotPasswordValidator,
     createProjectValidator,
     createTaskValidator,
-    createSubtaskValidator
+    createSubtaskValidator,
+    updateTaskValidator,
+    updateSubtaskValidator,
+    addProjectMemberValidator,
+    updateMemberRoleValidator,
+    createNoteValidator,
+    updateNoteValidator,
 }
